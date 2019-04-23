@@ -36,6 +36,7 @@ ofApp::ofApp(int _soundStream_Input_DeviceId, int _soundStream_Output_DeviceId)
 , b_NextImage(false)
 , b_DispFrameRate(false)
 , t_ResetAudio_from(-1)
+, b_ExchangeByHsv(false)
 {
 	fp_Log			= fopen("../../../data/Log.csv", "w");
 	fp_Log_main		= fopen("../../../data/Log_main.csv", "w");
@@ -401,12 +402,16 @@ void ofApp::StateChart(float now){
 				for(int i = 0; i < FBO_CAL_HEIGHT; i++){
 					ofColor col = pix_image.getColor( CursorPos * (double(FBO_CAL_HEIGHT) / double(FBO_HEIGHT)), i );
 					
-					float hue = 0;
-					float saturation = 0;
-					float brightness = 0;
-					col.getHsb(hue, saturation, brightness);
-					
-					th_AmpOfFreq->update_Amp(i, double(brightness)/255);
+					if(b_ExchangeByHsv){
+						float hue = 0;
+						float saturation = 0;
+						float brightness = 0;
+						col.getHsb(hue, saturation, brightness);
+						
+						th_AmpOfFreq->update_Amp(i, double(brightness)/255);
+					}else{
+						th_AmpOfFreq->update_Amp(i, 0.299 * (double)col.r/255 + 0.587 * (double)col.g/255 + 0.114 * (double)col.b/255);
+					}
 				}
 			}
 			break;
@@ -597,6 +602,15 @@ void ofApp::keyPressed(int key){
 			
 		case 'f':
 			b_DispFrameRate = !b_DispFrameRate;
+			break;
+			
+		case 'e':
+			b_ExchangeByHsv = !b_ExchangeByHsv;
+			
+			if(b_ExchangeByHsv)	printf("HSV\n");
+			else				printf("GRAY\n");
+			fflush(stdout);
+			
 			break;
 	}
 }

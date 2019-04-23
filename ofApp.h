@@ -117,6 +117,8 @@ private:
 	
 	bool b_DispFrameRate;
 	
+	bool b_ExchangeByHsv;
+	
 	/********************
 	********************/
 	ofSoundStream soundStream;
